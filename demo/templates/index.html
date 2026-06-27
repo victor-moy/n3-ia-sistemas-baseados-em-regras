@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Especialista — Triagem Médica</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e40af, #0ea5e9);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(14,165,233,0.3);
+    }
+
+    header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p  { font-size: 0.9rem; opacity: 0.8; margin-top: 0.3rem; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin-bottom: 1.2rem;
+    }
+
+    .symptoms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .symptom-item {
+      position: relative;
+    }
+
+    .symptom-item input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .symptom-item label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.65rem 1rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .symptom-item label::before {
+      content: '';
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #475569;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+
+    .symptom-item input:checked + label {
+      background: #0c4a6e;
+      border-color: #0ea5e9;
+      color: #e0f2fe;
+    }
+
+    .symptom-item input:checked + label::before {
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13.5 3.5l-8 8-3-3 1-1 2 2 7-7 1 1z'/%3E%3C/svg%3E");
+      background-size: 14px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .symptom-item label:hover {
+      border-color: #0ea5e9;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, #1e40af, #0ea5e9);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn:hover  { opacity: 0.9; }
+    .btn:active { transform: scale(0.99); }
+
+    .result-card {
+      border-color: #0ea5e9;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .diagnosis-main {
+      background: linear-gradient(135deg, #0c4a6e, #1e3a5f);
+      border: 1px solid #0ea5e9;
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .diagnosis-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7dd3fc;
+      margin-bottom: 0.4rem;
+    }
+
+    .diagnosis-text {
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #e0f2fe;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .tag {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 20px;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .tag.active {
+      background: #0c4a6e;
+      border-color: #0ea5e9;
+      color: #7dd3fc;
+    }
+
+    .rule-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #1e293b;
+      font-size: 0.875rem;
+    }
+
+    .rule-row:last-child { border-bottom: none; }
+
+    .rule-id {
+      flex-shrink: 0;
+      background: #0ea5e9;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .rule-desc  { font-weight: 500; color: #e2e8f0; }
+    .rule-conds { font-size: 0.8rem; color: #64748b; }
+
+    .alt-item {
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #1e293b;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .alt-item:last-child { border-bottom: none; }
+
+    .no-result {
+      background: #1c1917;
+      border-color: #78716c;
+    }
+
+    .warning {
+      font-size: 0.78rem;
+      color: #64748b;
+      text-align: center;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid #334155;
+    }
+
+    footer {
+      text-align: center;
+      color: #475569;
+      font-size: 0.8rem;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Sistema Especialista de Triagem Médica</h1>
+  <p>Sistemas Baseados em Regras — Inteligência Artificial</p>
+  <span class="badge">Encadeamento para Frente (Forward Chaining)</span>
+</header>
+
+<main>
+  <form method="POST">
+    <div class="card">
+      <div class="card-title">Selecione os sintomas presentes</div>
+      <div class="symptoms-grid">
+        {% for key, pergunta in sintomas.items() %}
+        <div class="symptom-item">
+          <input
+            type="checkbox"
+            id="{{ key }}"
+            name="{{ key }}"
+            {% if resultado and key in resultado.fatos %}checked{% endif %}
+          >
+          <label for="{{ key }}">
+            {{ pergunta.rstrip('?').replace('Você ', '').replace('Seus olhos estão', 'Olhos').capitalize() }}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="btn">Analisar Sintomas</button>
+  </form>
+
+  {% if resultado %}
+  <div class="card result-card" style="margin-top: 2rem;">
+    <div class="card-title">Resultado da Análise</div>
+
+    <div class="diagnosis-main {% if not resultado.regras_disparadas %}no-result{% endif %}">
+      <div class="diagnosis-label">Diagnóstico Principal</div>
+      <div class="diagnosis-text">{{ resultado.conclusao }}</div>
+    </div>
+
+    {% if resultado.fatos %}
+    <div class="section-label">Sintomas informados</div>
+    <div class="tag-list">
+      {% for f in resultado.fatos %}
+      <span class="tag active">{{ f.replace('_', ' ') }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="section-label">Nenhum sintoma selecionado</div>
+    {% endif %}
+
+    {% if resultado.regras_disparadas %}
+    <div class="section-label">Regras disparadas</div>
+    {% for r in resultado.regras_disparadas %}
+    <div class="rule-row">
+      <span class="rule-id">{{ r.id }}</span>
+      <div>
+        <div class="rule-desc">{{ r.descricao }}</div>
+        <div class="rule-conds">
+          Condições: {{ r.condicoes | map('replace', '_', ' ') | join(' + ') }}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if resultado.alternativas %}
+    <div class="section-label">Diagnósticos alternativos</div>
+    {% for r in resultado.alternativas %}
+    <div class="alt-item">{{ r.conclusao }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="warning">
+      Este sistema não substitui avaliação médica profissional.
+    </div>
+  </div>
+  {% endif %}
+</main>
+
+<footer>N3 — Inteligência Artificial &nbsp;|&nbsp; Prof. Claudinei Dias &nbsp;|&nbsp; 2026</footer>
+
+</body>
+</html>
