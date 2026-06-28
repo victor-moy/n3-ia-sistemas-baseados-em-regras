@@ -11,24 +11,21 @@ Sistema Especialista de Triagem Médica desenvolvido em Python, demonstrando os 
 
 O sistema analisa sintomas informados pelo usuário, aplica 10 regras de produção e apresenta o diagnóstico mais provável junto com a cadeia de inferência utilizada.
 
-## Como executar
+## Como executar localmente
 
-**Interface web (recomendado)**
+```bash
+pip install -r requirements.txt
+gunicorn --chdir demo app:app
+```
+
+Acesse `http://localhost:8000` no navegador.
+
+**Ou via Flask (dev):**
 
 ```bash
 pip install flask
 python demo/app.py
 ```
-
-Acesse `http://localhost:5000` no navegador.
-
-**Interface de linha de comando**
-
-```bash
-python demo/sistema_especialista.py
-```
-
-> Requer Python 3.7+. Sem dependências além do Flask para a interface web.
 
 ## Estrutura
 
@@ -36,18 +33,17 @@ python demo/sistema_especialista.py
 demo/
 ├── sistema_especialista.py   # motor de regras + CLI
 ├── app.py                    # servidor Flask
-├── requirements.txt
 └── templates/index.html      # interface web
 
 relatorio/
 └── relatorio.pdf             # relatório completo
 
 slides/
-└── slides.md                 # roteiro da apresentação
+└── Apresentação.pdf          # apresentação
 ```
 
 ## Integrantes
 
-- Laíza Silva  
-- Jhessica Alves  
+- Laíza Silva
+- Jhessica Alves
 - Victor Moy
